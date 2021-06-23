@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import './App.css';
 import * as tt from '@tomtom-international/web-sdk-maps';
+import '@tomtom-international/web-sdk-maps/dist/maps.css'
 
 const App = () => {
 	const mapElement = useRef();
@@ -21,18 +22,31 @@ const App = () => {
 				zoom: 14
 			});
 			setMap(map);
+
+
+
 			const addMarker = () => {
-				const marker = new tt.marker({
+				const element = document.createElement('div');
+				element.className = 'marker';
+				const marker = new tt.Marker({
 					draggable: true,
 					element: element
-				});
-			};
+				})
+				.setLngLat([ longitude, latitude ])
+				.addTo(map)
+				marker.on('dragend',()=>{
+					const lngLat = marker.getLngLat ();
+					  setLongitude(lngLat.lng)
+        			  setLatitude(lngLat.lat)
+
+				})
+			}
+			addMarker();
 			return () => map.remove();
-		},
-		[ longitude, latitude ]
-	);
+		},[ longitude, latitude ]);
 	return (
-		<div className="App">
+		<>
+		{map && (<div className="app">
 			<div ref={mapElement} className="map" />
 			<div className="search-bar">
 				<h1>Where to?</h1>
@@ -56,7 +70,11 @@ const App = () => {
 				/>
 			</div>
 		</div>
+		)}
+		</>
+				
 	);
 };
+
 
 export default App;
